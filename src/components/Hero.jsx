@@ -84,12 +84,7 @@ const Hero = () => {
                         Governança. Riscos. Compliance.
                     </h2>
 
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                        <span className="text-primary inline-block">The PRIVACY</span>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary-start to-secondary-end inline-block ml-2">
-                            BRASIL
-                        </span>
-                    </h1>
+
 
                     <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-6 font-light animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                         A privacidade que cria raiz
