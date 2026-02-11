@@ -13,7 +13,7 @@ function App() {
     return (
         <div className="min-h-screen bg-background text-text-primary font-sans">
             <Navbar />
-            <main>
+            <main className="pt-20">
                 <Hero />
                 <About />
                 <Objective />
