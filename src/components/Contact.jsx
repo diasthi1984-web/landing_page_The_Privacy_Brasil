@@ -11,22 +11,47 @@ const Contact = () => {
     });
     const [status, setStatus] = useState('idle'); // idle, submitting, success, error
 
+    const isFormValid = Object.values(formData).every(field => field.trim() !== '');
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!isFormValid) return;
+        
         setStatus('submitting');
 
-        // Simulate API call
-        setTimeout(() => {
-            console.log('Form Submitted:', formData);
-            setStatus('success');
-            setFormData({ nome: '', email: '', empresa: '', telefone: '', mensagem: '' });
+        try {
+            const response = await fetch("https://formsubmit.co/ajax/contato@theprivacybrasil.com", {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    _subject: `Novo Contato: ${formData.empresa} - ${formData.nome}`,
+                    _template: "table",
+                    ...formData
+                })
+            });
+
+            if (response.ok) {
+                setStatus('success');
+                setFormData({ nome: '', email: '', empresa: '', telefone: '', mensagem: '' });
+                setTimeout(() => setStatus('idle'), 5000);
+            } else {
+                console.error("Erro no envio:", response);
+                setStatus('error');
+                setTimeout(() => setStatus('idle'), 3000);
+            }
+        } catch (error) {
+            console.error("Erro:", error);
+            setStatus('error');
             setTimeout(() => setStatus('idle'), 3000);
-        }, 1000);
+        }
     };
 
     return (
@@ -62,6 +87,7 @@ const Contact = () => {
                                     value={formData.nome}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-secondary-start focus:ring-2 focus:ring-secondary-start/20 outline-none transition-all"
+                                    placeholder="Seu nome"
                                 />
                             </div>
 
@@ -76,6 +102,7 @@ const Contact = () => {
                                         value={formData.email}
                                         onChange={handleChange}
                                         className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-secondary-start focus:ring-2 focus:ring-secondary-start/20 outline-none transition-all"
+                                        placeholder="seu@email.com"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -84,9 +111,11 @@ const Contact = () => {
                                         type="tel"
                                         id="telefone"
                                         name="telefone"
+                                        required
                                         value={formData.telefone}
                                         onChange={handleChange}
                                         className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-secondary-start focus:ring-2 focus:ring-secondary-start/20 outline-none transition-all"
+                                        placeholder="(11) 99999-9999"
                                     />
                                 </div>
                             </div>
@@ -97,9 +126,11 @@ const Contact = () => {
                                     type="text"
                                     id="empresa"
                                     name="empresa"
+                                    required
                                     value={formData.empresa}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-secondary-start focus:ring-2 focus:ring-secondary-start/20 outline-none transition-all"
+                                    placeholder="Nome da sua empresa"
                                 />
                             </div>
 
@@ -113,16 +144,20 @@ const Contact = () => {
                                     value={formData.mensagem}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-secondary-start focus:ring-2 focus:ring-secondary-start/20 outline-none transition-all resize-none"
+                                    placeholder="Como podemos ajudar?"
                                 ></textarea>
                             </div>
 
                             <button
                                 type="submit"
-                                disabled={status === 'submitting'}
-                                className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-70"
+                                disabled={!isFormValid || status === 'submitting'}
+                                className={`w-full btn-primary flex items-center justify-center gap-2 transition-all duration-300 ${
+                                    !isFormValid || status === 'submitting' ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02]'
+                                }`}
                             >
                                 {status === 'submitting' ? 'Enviando...' : (
                                     status === 'success' ? <span className="flex items-center gap-2"><CheckCircle size={20} /> Mensagem Enviada!</span> :
+                                    status === 'error' ? <span className="flex items-center gap-2"><AlertCircle size={20} /> Erro ao enviar. Tente novamente.</span> :
                                         <span className="flex items-center gap-2">Enviar Mensagem <Send size={18} /></span>
                                 )}
                             </button>
